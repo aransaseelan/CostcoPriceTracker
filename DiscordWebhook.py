@@ -1,10 +1,13 @@
 from discord_webhook import DiscordWebhook, DiscordEmbed 
 
+
 def discordWebhook(URL, elements):
+    
+
     webhook = DiscordWebhook(url="https://discord.com/api/webhooks/1242352992708067338/lqTnn9985LOSs55jwkxYPPAdD8OxviUp4-YBemJkTRxojbAroYvZzR8RqSWg6FtKo6Ks")
 
     # create embed object for webhook
-    embed = DiscordEmbed(title="Your Title", description="Lorem ipsum dolor sit", color="03b2f8")
+    embed = DiscordEmbed(title=elements[0], description="Lorem ipsum dolor sit", color="03b2f8")
 
     # set author
     embed.set_author(name="Author Name", url=URL, icon_url=URL)

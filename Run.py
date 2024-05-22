@@ -1,6 +1,7 @@
 from FileReader import FileReader
-from GetUrl import getUrl
+from get_url import getUrl
 from UrlBeautifulSoup import get_soup
+from price_checker import getCurrentPrice
 from DiscordWebhook import discordWebhook
 
 def main():
@@ -8,7 +9,9 @@ def main():
     Urls = getUrl(productID)
     
     for url in Urls:
-        soup = get_soup(url)
+        images = get_soup(url)
+        prices = getCurrentPrice(url)
+        
     
     #Url to the Discord Webhook
     #Begins
@@ -18,4 +21,3 @@ def main():
     
 if __name__ == "__main__":
     main()
-    

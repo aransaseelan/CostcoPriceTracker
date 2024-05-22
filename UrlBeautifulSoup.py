@@ -32,12 +32,10 @@ class get_soup():
     def process_elements(self):
         elements = []
         for element_tag, element_id in self.elements_tags_ids:
-            element = self.find_element_by_id(self.soup, element_tag, element_id)
+            element = self.find_element_by_id(self.soup, element_tag, element_id)            
             if element:
                 elements.append(element['src'])
         if elements:
             discordWebhook(self.url, elements)
-
-
-
+    
     
