@@ -18,6 +18,6 @@ jobs:
       with:
         python-version: '3.8'
     - name: Install dependencies
-      run: pip install -r requirements.txt
+      run: pip install -r ID.txt
     - name: Run script
-      run: python your_script.py
+      run: python Run.py
