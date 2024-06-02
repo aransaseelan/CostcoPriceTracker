@@ -24,7 +24,7 @@ def get_elements(url):
         print("WebDriverException occurred. Retrying...")
         driver.get(url)
     
-    time.sleep(13)
+    time.sleep(20)
     
     # Find the price element
     name = get_name(driver)
