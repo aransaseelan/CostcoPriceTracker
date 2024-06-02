@@ -35,7 +35,7 @@ def get_elements(url):
     
 def get_price(driver):
     price_element = ''
-    while (price_element == '-.- -' or price_element == ''):
+    while (price_element == '- -.- -' or price_element == ''):
         price_element = driver.find_element(By.CSS_SELECTOR, 'span[automation-id="productPriceOutput"]')
         print(price_element.text)
     return price_element.text
