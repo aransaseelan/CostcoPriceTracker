@@ -2,6 +2,9 @@ from selenium.webdriver.common.by import By
 import time
 from selenium import webdriver
 from selenium.common.exceptions import WebDriverException
+# from selenium.webdriver.support import expected_conditions as EC 
+# from selenium.webdriver.support.ui import WebDriverWait
+# from selenium.common.exceptions import WebDriverException, TimeoutException, NoSuchElementException
 
 
 
@@ -35,7 +38,7 @@ def get_elements(url):
     
 def get_price(driver):
     price_element = ''
-    while (price_element == '- -.- -' or price_element == ''):
+    while (price_element.text == '- -.- -' or price_element.text == ''):
         price_element = driver.find_element(By.CSS_SELECTOR, 'span[automation-id="productPriceOutput"]')
         print(price_element.text)
     return price_element.text
