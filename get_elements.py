@@ -24,7 +24,7 @@ def get_elements(url):
         print("WebDriverException occurred. Retrying...")
         driver.get(url)
     
-    time.sleep(20)
+    time.sleep(5)
     
     # Find the price element
     name = get_name(driver)
@@ -34,8 +34,10 @@ def get_elements(url):
     return price, image, name  
     
 def get_price(driver):
-    price_element = driver.find_element(By.CSS_SELECTOR, 'span[automation-id="productPriceOutput"]')
-    print(price_element.text)
+    price_element = ''
+    while (price_element == '- -.- -' or price_element == ''):
+        price_element = driver.find_element(By.CSS_SELECTOR, 'span[automation-id="productPriceOutput"]')
+        print(price_element.text)
     return price_element.text
     
     
