@@ -13,7 +13,13 @@ def get_elements(url):
     options.add_argument('--ignore-certificate-errors')
     options.add_argument('--ignore-ssl-errors')
     options.add_argument('--ignore-certificate-errors-spki-list')
-    options.add_argument('--ignore-ssl-errors')
+    options.add_argument('--disable-dev-shm-usage')
+    options.add_argument('--no-sandbox')
+    options.add_argument('--disable-gpu')
+    options.add_argument('--window-size=1920x1080')  # Optional: specify window size
+    options.add_argument('--disable-extensions')
+    options.add_argument('--disable-software-rasterizer')
+    options.add_argument('--disable-popup-blocking')
     options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36")
 
     driver = webdriver.Chrome(options=options)

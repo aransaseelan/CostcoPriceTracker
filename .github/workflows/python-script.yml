@@ -1,37 +1,34 @@
-name: Run Python Script
+name: Run Python Script on Windows
 
 on: 
   push: 
     branches: [ main ]
   pull_request:
     branches: [ main ]
-  workflow_dispatch: # Run manually
+  workflow_dispatch: # Allow manual triggering of the workflow
 
 jobs:
   run-script:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest  # Use the latest Windows runner
 
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
+      # Checkout the repository to the GitHub Actions runner
 
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
-        python-version: '3.9'
+        python-version: '3.9'  # Specify the Python version to use
 
-    - name: Install necessary packages
-      run: sudo apt-get update && sudo apt-get install -y \
-        google-chrome-stable \
-        xvfb \
-        python3-pip
+    - name: Install Google Chrome
+      run: choco install googlechrome --ignore-checksums
+
+    - name: Install ChromeDriver
+      run: choco install chromedriver --ignore-checksums
 
     - name: Install Python dependencies
-      run: pip install chromedriver-autoinstaller selenium pyvirtualdisplay
-
-    - name: Set up display
-      run: Xvfb :99 -ac & export DISPLAY=:99
+      run: pip install chromedriver-autoinstaller selenium
 
     - name: Run script
       run: python Run.py
-
