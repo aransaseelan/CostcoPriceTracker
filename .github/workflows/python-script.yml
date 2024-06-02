@@ -1,5 +1,5 @@
 name: Run Python Script
- 
+
 on: 
   push: 
     branches: [ main ]
@@ -12,21 +12,26 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
-        python-version: '3.x'
-    
+        python-version: '3.9'
 
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip 
-        pip install -r IDs.txt
-    
-    - name: Check Python version
-      run: python --version
+    - name: Install necessary packages
+      run: sudo apt-get update && sudo apt-get install -y \
+        google-chrome-stable \
+        xvfb \
+        python3-pip
+
+    - name: Install Python dependencies
+      run: pip install chromedriver-autoinstaller selenium pyvirtualdisplay
+
+    - name: Set up display
+      run: Xvfb :99 -ac & export DISPLAY=:99
 
     - name: Run script
-      run: |
-       python3 Run.py
+      run: python Run.py
+
