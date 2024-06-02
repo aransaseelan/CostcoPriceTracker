@@ -28,7 +28,9 @@ jobs:
       run: choco install chromedriver --ignore-checksums
 
     - name: Install Python dependencies
-      run: pip install chromedriver-autoinstaller selenium
+      run: pip install chromedriver-autoinstaller selenium discord_webhook
+    
+    -name: 
 
     - name: Run script
       run: python Run.py
