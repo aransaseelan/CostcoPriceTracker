@@ -24,8 +24,8 @@ jobs:
     - name: Install Google Chrome
       run: choco install googlechrome --ignore-checksums
 
-    - name: Install ChromeDriver
-      run: choco install chromedriver --ignore-checksums
+    - name: Remove existing ChromeDriver
+      run: if exist C:\SeleniumWebDrivers\ChromeDriver\chromedriver.exe del C:\SeleniumWebDrivers\ChromeDriver\chromedriver.exe
 
     - name: Install Python dependencies
       run: pip install chromedriver-autoinstaller selenium discord_webhook
