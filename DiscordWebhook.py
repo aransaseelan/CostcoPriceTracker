@@ -18,6 +18,8 @@ def discordWebhook(url, name, price, image):
     # set thumbnail with the same or different image
     embed.set_thumbnail(url=image)
     
+    embed.add_embed_field(name="Discount", value="Deez Nutz")
+    
     # set footer
     embed.set_footer(text="Aran Saseelan Bot", icon_url=url)
 
