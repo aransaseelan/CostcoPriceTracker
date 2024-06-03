@@ -3,10 +3,10 @@ import time
 from selenium import webdriver
 from selenium.common.exceptions import WebDriverException
 from postal_code_input import put_postalcode
-# from selenium.webdriver.support import expected_conditions as EC 
-# from selenium.webdriver.support.ui import WebDriverWait
-# from selenium.common.exceptions import WebDriverException, TimeoutException, NoSuchElementException
-
+from accept_cookies import accept_cookies
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.by import By
 
 
 
@@ -28,12 +28,12 @@ def get_elements(url):
         print("WebDriverException occurred. Retrying...")
         driver.get(url)
     
-    #time.sleep(5)
+    time.sleep(8)
     
     # Find the price element
-    price = get_price(driver)
     name = get_name(driver)
     image = get_image(driver)
+    price = get_price(driver)
 
     return price, image, name  
     
@@ -43,14 +43,18 @@ def get_price(driver):
     price_element = driver.find_element(By.CSS_SELECTOR, 'span[automation-id="productPriceOutput"]')
     price_text = price_element.text
     if (price_text == '- -.- -' or price_text == ''):
-        put_postalcode(driver)
+        accept_cookies(driver)
+        time.sleep(10)
         price_element = driver.find_element(By.CSS_SELECTOR, 'span[automation-id="productPriceOutput"]')
-
+        if (price_element.text == '- -.- -' or price_element.text == ''):
+            put_postalcode(driver)
+            # Wait until the price element is updated
+            WebDriverWait(driver, 20).until_not(EC.text_to_be_present_in_element((By.CSS_SELECTOR, 'span[automation-id="productPriceOutput"]'), '- -.- -'))
+            price_element = driver.find_element(By.CSS_SELECTOR, 'span[automation-id="productPriceOutput"]')
+        price_text = price_element.text
     print(price_text)
     return price_text
     
-    
-
 def get_image(driver):
     image_element = driver.find_element(By.ID, 'initialProductImage')
     print(image_element.get_attribute('src'))
