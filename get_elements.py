@@ -4,6 +4,7 @@ from selenium import webdriver
 from selenium.common.exceptions import WebDriverException
 from postal_code_input import put_postalcode
 from accept_cookies import accept_cookies
+from amount_discount import get_discount
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
@@ -34,8 +35,9 @@ def get_elements(url):
     name = get_name(driver)
     image = get_image(driver)
     price = get_price(driver)
+    discount = get_discount(driver)
 
-    return price, image, name  
+    return price, image, name, discount  
     
 def get_price(driver):
     price_element = None

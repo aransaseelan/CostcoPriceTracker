@@ -15,8 +15,9 @@ def main():
         price = product_info[0]
         image = product_info[1]
         name = product_info[2]
+        discount = product_info[3]
         #Sends the information to the Discord Webhook
-        discordWebhook(url, name, price, image)
+        discordWebhook(url, name, price, image, discount)
          
 if __name__ == "__main__":
     main()
