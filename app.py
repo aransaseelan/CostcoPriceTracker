@@ -1,5 +1,4 @@
-from FileReader import FileReader
-from get_url import getUrl
+from helper import FileReader, getUrl
 from get_elements import get_elements
 from DiscordWebhook import discordWebhook
 
