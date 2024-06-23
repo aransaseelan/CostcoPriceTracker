@@ -33,4 +33,4 @@ jobs:
       run: pip install chromedriver-autoinstaller selenium discord_webhook
 
     - name: Run script
-      run: python Run.py
+      run: python app.py
