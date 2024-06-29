@@ -6,7 +6,7 @@ on:
   pull_request:
     branches: [ main ]
   schedule:
-    - cron: '*/5 * * * *' # Run the workflow every 5 minutes
+    - cron: '5 8,20 * * *' # Run the workflow at 3:05 AM and 3:05 PM EST
   workflow_dispatch: # Allow manual triggering of the workflow
 
 jobs:
@@ -33,4 +33,4 @@ jobs:
       run: pip install chromedriver-autoinstaller selenium discord_webhook
 
     - name: Run script
-      run: python Run.py
+      run: python app.py
