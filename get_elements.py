@@ -6,6 +6,7 @@ from postal_code_input import put_postalcode
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
+from selenium.common.exceptions import NoSuchElementException, TimeoutException
 
 
 
@@ -34,8 +35,9 @@ def get_elements(url):
     image = get_image(driver)
     price = get_price(driver)
     discount = get_discount(driver)
+    limited_offer = limited_time_offer(driver)
 
-    return price, image, name, discount  
+    return price, image, name, discount, limited_offer  
     
 def get_price(driver):
     price_element = None
@@ -60,6 +62,13 @@ def get_image(driver):
     print(image_element.get_attribute('src'))
     return image_element.get_attribute('src')
    
+def limited_time_offer(driver):
+    try:
+        marketing_container = driver.find_element(By.CLASS_NAME, "marketing-container")
+        marketing_container.find_element(By.CLASS_NAME, "PromotionalText")
+        return True
+    except NoSuchElementException:
+        return False
 
 def get_name(driver):
     name_element = driver.find_element(By.CSS_SELECTOR, 'h1[itemprop="name"]')
@@ -74,9 +83,7 @@ def get_discount(driver):
         discount_amount = discount_element.text
         if discount_amount == "":
             discount_amount = "0"
-        print(discount_amount)
     except Exception as e:
-        print(e)
         discount_amount = "No discount"
     print(f"Amount discount: {discount_amount}")
     return discount_amount
