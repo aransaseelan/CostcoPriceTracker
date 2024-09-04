@@ -7,7 +7,7 @@ from selenium.common.exceptions import WebDriverException
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
-from selenium.common.exceptions import NoSuchElementException, TimeoutException
+from selenium.common.exceptions import NoSuchElementException, TimeoutException, ElementNotInteractableException
 
 
 def main():
@@ -44,24 +44,31 @@ def main():
 def get_price(driver):
     price_element = None
     price_text = ''
-    price_element = driver.find_element(By.CSS_SELECTOR, 'span[automation-id="productPriceOutput"]')
-    price_text = price_element.text
-    if (price_text == '- -.- -' or price_text == ''):
-        accept_cookies(driver)
-        time.sleep(10)
+    
+    try:
         price_element = driver.find_element(By.CSS_SELECTOR, 'span[automation-id="productPriceOutput"]')
-        if (price_element.text == '- -.- -' or price_element.text == ''):
-            put_postalcode(driver)
-            # Wait until the price element is updated
-            WebDriverWait(driver, 20).until_not(EC.text_to_be_present_in_element((By.CSS_SELECTOR, 'span[automation-id="productPriceOutput"]'), '- -.- -'))
-            price_element = driver.find_element(By.CSS_SELECTOR, 'span[automation-id="productPriceOutput"]')
         price_text = price_element.text
+        if (price_text == '- -.- -' or price_text == ''):
+            accept_cookies(driver)
+            time.sleep(10)
+            price_element = driver.find_element(By.CSS_SELECTOR, 'span[automation-id="productPriceOutput"]')
+            if (price_element.text == '- -.- -' or price_element.text == ''):
+                put_postalcode(driver)
+                # Wait until the price element is updated
+                WebDriverWait(driver, 20).until_not(EC.text_to_be_present_in_element((By.CSS_SELECTOR, 'span[automation-id="productPriceOutput"]'), '- -.- -'))
+                price_element = driver.find_element(By.CSS_SELECTOR, 'span[automation-id="productPriceOutput"]')
+            price_text = price_element.text
+    except (NoSuchElementException, ElementNotInteractableException):        print("Price not found")
     print(price_text)
     return price_text
     
 def get_image(driver):
-    image_element = driver.find_element(By.ID, 'initialProductImage')
-    print(image_element.get_attribute('src'))
+    image_src = ''
+    try:
+        image_element = driver.find_element(By.ID, 'initialProductImage')
+        print(image_element.get_attribute('src'))
+    except NoSuchElementException:
+        print("Image element not found")
     return image_element.get_attribute('src')
    
 def limited_time_offer(driver):
@@ -69,7 +76,7 @@ def limited_time_offer(driver):
         marketing_container = driver.find_element(By.CLASS_NAME, "marketing-container")
         marketing_container.find_element(By.CLASS_NAME, "PromotionalText")
         return True
-    except NoSuchElementException:
+    except (NoSuchElementException, ElementNotInteractableException):
         return False
 
 def get_name(driver):
