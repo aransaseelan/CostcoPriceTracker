@@ -1,4 +1,4 @@
-chromedriver-autoinstaller=
+chromedriver-autoinstaller
 selenium 
 discord_webhook
 fastapi

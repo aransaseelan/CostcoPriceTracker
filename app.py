@@ -38,8 +38,9 @@ def main():
         price = get_price(driver)
         discount = get_discount(driver)
         limited_offer = limited_time_offer(driver)
+        stock = check_stock(driver)
         #Sends the information to the Discord Webhook
-        discordWebhook(url, name, price, image, discount, limited_offer)
+        discordWebhook(url, name, price, image, discount, limited_offer, stock)
          
 def get_price(driver):
     price_element = None
@@ -96,6 +97,26 @@ def get_discount(driver):
         discount_amount = "No discount"
     print(f"Amount discount: {discount_amount}")
     return discount_amount
+
+from selenium.webdriver.common.by import By
+from selenium.common.exceptions import NoSuchElementException
+
+def check_stock(driver):
+    try:
+        # Correcting how By.XPATH is used and selecting the input element
+        stock_element = driver.find_element(By.XPATH, '//input[@id="add-to-cart-btn" and @automation-id="addToCartButton" and @name="add-to-cart" and contains(@class, "primary-button-v2")]')
+        
+        # Instead of using .text, use .get_attribute('value') to get the button's text
+        stock_text = stock_element.get_attribute("value")
+        print(stock_text)
+        if stock_text == "Add to Cart":
+            return "In stock"
+        else:
+            return "Out of stock"
+    except NoSuchElementException:
+        print("Stock not found")
+        return "No element Found"
+
 
 def accept_cookies(driver):
     # Wait until the cookies button is clickable
