@@ -21,7 +21,7 @@ def post_to_discord(webhook_url, url, name, price, image, discount, stock):
     embed.set_author(name=name, url=url, icon_url=url)
 
     # set image with the provided link
-    embed.set_image(url=image)
+    embed.set_image(url=url)
 
     # set thumbnail with the same or different image
     embed.set_thumbnail(url=image)
