@@ -12,6 +12,7 @@ on:
 jobs:
   run-script:
     runs-on: windows-latest  # Use the latest Windows runner
+    environment: Github Actions
 
     steps:
     - name: Checkout repository
