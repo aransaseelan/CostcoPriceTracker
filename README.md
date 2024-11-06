@@ -2,7 +2,7 @@
 
 This Python script tracks product prices on Costco's website and sends updates via Discord Webhook.
 
-## Features
+## Feature
 
 - Reads product IDs from a file and generates corresponding Costco URLs.
 - Retrieves product information such as name, price, image, stock, and discount.
