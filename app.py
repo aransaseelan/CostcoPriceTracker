@@ -1,7 +1,8 @@
-from helper import FileReader, getUrl
+from helper import FileReader, getUrl, write_internal_id
 from DiscordWebhook import discordWebhook
 from selenium.webdriver.common.by import By
 import time
+import logging as logger
 from selenium import webdriver
 from selenium.common.exceptions import WebDriverException
 from selenium.webdriver.support.ui import WebDriverWait
@@ -39,6 +40,7 @@ def main():
         discount = get_discount(driver)
         limited_offer = limited_time_offer(driver)
         stock = check_stock(driver)
+        internal_id = get_internal_id(driver)
         #Sends the information to the Discord Webhook
         discordWebhook(url, name, price, image, discount, limited_offer, stock)
          
@@ -130,6 +132,24 @@ def put_postalcode(driver):
     postal_code_input.send_keys('M1T 3C4')
     submit_button = WebDriverWait(driver, 30).until(EC.element_to_be_clickable((By.ID, 'postal-code-submit-btn')))
     submit_button.click()
+
+def get_internal_id(driver, timeout=10):
+    try:
+        # Wait for at least one element with the name "productBeanId" to be present
+        WebDriverWait(driver, 10).until(
+            EC.presence_of_element_located((By.XPATH, "//input[@name='productBeanId']"))
+        )
+        
+        product_id = driver.find_elements(By.XPATH, "//input[@name='productBeanId']")
+        product_id = [element.get_attribute("value") for element in product_id]
+        
+        print(product_id)
+        write_internal_id(product_id[0])
+        return product_id
+    except Exception as e:
+        logger.info(f"Product IDs not found - {e}")
+        print(f"Product IDs not found - {e}")
+        return []
 
 if __name__ == "__main__":
     main()
