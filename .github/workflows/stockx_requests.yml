@@ -1,13 +1,10 @@
 name: StockX Requests
-
+#Currently won't work due to cloudflare protection
 on: 
   push: 
     branches: [ main ]
   pull_request:
     branches: [ main ]
-  schedule:
-    - cron: '5 8,20 * * *' # Run the workflow at 3:05 AM and 3:05 PM EST
-  workflow_dispatch: # Allow manual triggering of the workflow
 
 jobs:
   run-script:
