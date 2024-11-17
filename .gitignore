@@ -4,3 +4,5 @@ venv/
 footlocker/
 downloaded_files/
 __pycache__/
+.env_stockx
+*.csv
