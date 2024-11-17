@@ -31,6 +31,16 @@ with SB(uc=True) as sb:
 
     sb.wait(random.randint(2, 10))
 
+    while True:
+        try:
+            sb.click('button.css-1jepaz9')
+            sb.wait(random.randint(7,19)) 
+        except Exception as e:
+            print("No more buttons to click:", e)
+            break
+
+    sb.wait(20)
+
     try:
         product_elements = sb.find_elements("div.css-xlavhd")
         print(f"Found {len(product_elements)} favorite products.")
