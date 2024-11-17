@@ -5,14 +5,14 @@ def getUrl(productID):
     return url
 
 def FileReader():
-    with open('IDs.txt', 'r') as file:
+    with open('costco_main/IDs.txt', 'r') as file:
         productIDs = file.read().splitlines()
     return productIDs
 
 def write_internal_id(internal_ID):
-    with open('Internal_IDs.txt', 'r') as file:
+    with open('costco_main/Internal_IDs.txt', 'r') as file:
         productIDs = file.read().splitlines()
         
     if internal_ID not in productIDs:
-        with open('Internal_IDs.txt', 'a') as file: 
+        with open('costco_main/Internal_IDs.txt', 'a') as file: 
             file.write(internal_ID + '\n')
