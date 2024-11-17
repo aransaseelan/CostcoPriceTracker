@@ -3,3 +3,4 @@ venv/
 *.pyc
 footlocker/
 downloaded_files/
+__pycache__/
