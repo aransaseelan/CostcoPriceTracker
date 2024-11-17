@@ -27,6 +27,6 @@ jobs:
     - name: Run script
       env:
         WEBHOOKNOSALE: ${{ secrets.STOCKX_USERNAME }}
-        WEBHOOKSALE: ${{ secrets.STOCKX_PASSWORD}}
+        WEBHOOKSALE: ${{ secrets.STOCKX_PASSWORD }}
       run: 
         python stockx_favourites/stockx_requests.py
