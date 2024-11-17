@@ -1,0 +1,16 @@
+from seleniumbase import SB
+import time
+
+with SB(uc=True) as sb:
+
+    url = "https://accounts.stockx.com/login"
+    sb.uc_open_with_reconnect(url, 4)
+    sb.uc_gui_click_captcha()
+
+    # Login to StockX
+    sb.type('#email-login', 'aran.saseelan@gmail.com')
+    sb.type('#password', 'Aran1234')
+    # Enter email into the input field
+    email = "your-email@example.com"
+    sb.type(email_input_selector, email)
+

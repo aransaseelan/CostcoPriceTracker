@@ -2,15 +2,17 @@ from selenium import webdriver
 
 class get_new_cookie:
 
-    def get_cookie(self, header):
+    def get_cookie(self):
         webdriver = self.webdriver_setup()
         webdriver.get("https://www.costco.ca/")
         all_cookies = webdriver.get_cookies()
         cookies_dict = {}
+        cookie_string = ""
         for cookie in all_cookies:
-            cookies_dict[cookie['name']] = cookie['value']
-            header['Cookie'] = cookie['value']
-        print(cookies_dict)
+            cookie_string += f"{cookie['name']}={cookie['value']}; "
+        cookie_string = cookie_string.strip("; ")
+        print(cookie_string)
+        return cookie_string
 
 
     def webdriver_setup(self):
@@ -23,5 +25,7 @@ class get_new_cookie:
 
         driver = webdriver.Chrome(options=options)
         return driver
+    
+
 
 
