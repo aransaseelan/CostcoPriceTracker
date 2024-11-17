@@ -1,4 +1,4 @@
-name: Run Python Script on Windows
+name: Costco Main
 
 on: 
   push: 
