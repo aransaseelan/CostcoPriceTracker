@@ -22,7 +22,7 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
-        python-version: '3.9'  # Specify the Python version to use
+        python-version: '3.13.0'  # Specify the Python version to use
 
     - name: Install Google Chrome
       run: choco install googlechrome --ignore-checksums
@@ -31,7 +31,7 @@ jobs:
       run: choco install chromedriver --ignore-checksums
 
     - name: Install Python dependencies
-      run: pip install -r requirements.txt
+      run: pip3 install -r requirements.txt
 
     - name: Run script
       env:
