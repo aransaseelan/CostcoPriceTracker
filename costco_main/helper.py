@@ -7,7 +7,7 @@ def getUrl(productID):
     return url
 
 def FileReader():
-    with open('IDs.txt', 'r') as file:
+    with open('../IDs.txt', 'r') as file:
         productIDs = file.read().splitlines()
     return productIDs
 
