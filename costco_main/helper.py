@@ -20,10 +20,10 @@ def write_product_id(product_ID):
             file.write(product_ID + '\n')
 
 def write_item_id(item_ID):
-    with open('IDs.txt', 'r') as file:
+    with open('../IDs.txt', 'r') as file:
         productIDs = file.read().splitlines()
         
     if item_ID not in productIDs:
-        with open('IDs.txt', 'a') as file: 
+        with open('../IDs.txt', 'a') as file: 
             file.write(item_ID + '\n')
 
