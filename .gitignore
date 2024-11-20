@@ -6,3 +6,4 @@ downloaded_files/
 __pycache__/
 .env_stockx
 *.csv
+.env_yahoo

@@ -4,3 +4,4 @@ discord_webhook
 fastapi
 python-dotenv
 selenium-base
+tls-client

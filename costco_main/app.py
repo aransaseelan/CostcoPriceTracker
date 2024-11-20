@@ -1,4 +1,4 @@
-from helper import FileReader, getUrl, write_internal_id
+from helper import FileReader, getUrl, write_product_id
 from DiscordWebhook import discordWebhook
 from selenium.webdriver.common.by import By
 import time
@@ -40,7 +40,8 @@ def main():
         discount = get_discount(driver)
         limited_offer = limited_time_offer(driver)
         stock = check_stock(driver)
-        internal_id = get_internal_id(driver)
+        product_id = get_product_id(driver)
+        data_catentry = get_data_catentry(driver)
         #Sends the information to the Discord Webhook
         discordWebhook(url, name, price, image, discount, limited_offer, stock)
          
@@ -133,7 +134,7 @@ def put_postalcode(driver):
     submit_button = WebDriverWait(driver, 30).until(EC.element_to_be_clickable((By.ID, 'postal-code-submit-btn')))
     submit_button.click()
 
-def get_internal_id(driver, timeout=10):
+def get_product_id(driver, timeout=10):
     try:
         # Wait for at least one element with the name "productBeanId" to be present
         WebDriverWait(driver, 10).until(
@@ -144,12 +145,23 @@ def get_internal_id(driver, timeout=10):
         product_id = [element.get_attribute("value") for element in product_id]
         
         print(product_id)
-        write_internal_id(product_id[0])
+        write_product_id(product_id[0])
         return product_id
     except Exception as e:
         logger.info(f"Product IDs not found - {e}")
         print(f"Product IDs not found - {e}")
         return []
+
+def get_data_catentry(driver):
+    try:
+        # Locate the div element using its class name
+        div_element = driver.find_element(By.XPATH, '//div[@class="disc hide"]')
+        # Extract the data-catentry attribute value
+        data_catentry = div_element.get_attribute('data-catentry')
+        return data_catentry
+    except NoSuchElementException:
+        print("Data catentry not found")
+        return ""
 
 if __name__ == "__main__":
     main()
