@@ -11,9 +11,9 @@ logger = logger.getLogger(__name__)
 
 class api_calls:
 
-    def get_price(productId: str):
+    def get_price(productId: str, itemID: str):
         try: 
-            price_api = f"https://www.costco.com/AjaxGetInventoryDetail?itemId={productId}&storeId=10302"
+            price_api = f"https://www.costco.ca/AjaxGetContractPrice?itemId={itemID}&productId={productId}"
             session = tls_client.Session(
                 client_identifier="chrome112",
                 random_tls_extension_order=True

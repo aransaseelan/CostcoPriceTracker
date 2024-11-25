@@ -1,0 +1,41 @@
+name: Costco Requests
+
+on: 
+  push: 
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  schedule:
+    - cron: '5 8,20 * * *' # Run the workflow at 3:05 AM and 3:05 PM EST
+  workflow_dispatch: # Allow manual triggering of the workflow
+
+jobs:
+  run-script:
+    runs-on: windows-latest  # Use the latest Windows runner
+    environment: Github Actions
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      # Checkout the repository to the GitHub Actions runner
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.13.0'  # Specify the Python version to use
+
+    - name: Install Google Chrome
+      run: choco install googlechrome --ignore-checksums
+
+    - name: Install ChromeDriver
+      run: choco install chromedriver --ignore-checksums
+
+    - name: Install Python dependencies
+      run: pip3 install -r requirements.txt
+
+    - name: Run script
+      env:
+        WEBHOOKNOSALE: ${{ secrets.WEBHOOKNOSALE }}
+        WEBHOOKSALE: ${{ secrets.WEBHOOKSALE }}
+      run: 
+        python costco_requests/main.py

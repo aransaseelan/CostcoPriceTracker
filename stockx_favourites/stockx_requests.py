@@ -5,7 +5,7 @@ import csv
 import os 
 from dotenv import load_dotenv
 
-dotenv_path = '.env_stockx'
+dotenv_path = 'stockx_favourites/.env_stockx'
 
 load_dotenv(dotenv_path=dotenv_path)
 
