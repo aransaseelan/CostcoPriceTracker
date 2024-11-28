@@ -39,6 +39,24 @@ This Python script logins into your profile, gets all your favourites and puts t
 
 This script can be automated to run at regular intervals using GitHub Actions. The provided `.github/workflows/python-script.yml` file is configured to run the script every 12 hours. You can adjust this interval by modifying the cron schedule.
 
+
+## Request Based Costco Module 
+
+There is a new workflow file which uses a request based 
+approach to gather the valuable price and stock information.
+The Costco Canada API is currently allowed to anyone to call.
+This can change at anytime and the best way to go to these 
+websites are by scraping them. This in turn requires more 
+resources though if you require a fast way to gather information.
+The request based module is better. 
+
+The IP addresses are also more likely to get banned through
+the request based module. It is using a TLS fingerprint 
+through the Selenium UC framework but this is can 
+obviously be clipped or banned at anytime. 
+
 ## Contributing
 
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
+
+
