@@ -2,10 +2,6 @@
 
 This Python script tracks product prices on Costco's website and sends updates via Discord Webhook.
 
-<img width="263" alt="OtherImage" src="https://github.com/user-attachments/assets/4dc5942c-93dc-4479-ae78-2ca4d5ed1700">
-
-This Python script logins into your profile, gets all your favourites and puts them into CSV formatting. 
-
 ## Feature
 
 - Reads product IDs from a file and generates corresponding Costco URLs.
@@ -42,18 +38,17 @@ This script can be automated to run at regular intervals using GitHub Actions. T
 
 ## Request Based Costco Module 
 
-There is a new workflow file which uses a request based 
-approach to gather the valuable price and stock information.
-The Costco Canada API is currently allowed to anyone to call.
-This can change at anytime and the best way to go to these 
-websites are by scraping them. This in turn requires more 
-resources though if you require a fast way to gather information.
-The request based module is better. 
+There is a new workflow file that uses a request-based
+approach to gather valuable price and stock information.
+Anyone can currently call the Costco Canada API.
+This can change over time; the best way to access these 
+websites is by scraping them, which is more challenging for them to ban. However, scraping requires more
+resources, so if you need a fast way to gather information, the request-based module is better. 
 
 The IP addresses are also more likely to get banned through
-the request based module. It is using a TLS fingerprint 
-through the Selenium UC framework but this is can 
-obviously be clipped or banned at anytime. 
+the request-based module. It uses a TLS fingerprint 
+through the Selenium UC framework, but this is can 
+be clipped or banned at any time. 
 
 ## Contributing
 
