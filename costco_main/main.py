@@ -1,4 +1,13 @@
 from helper import FileReader, getUrl, write_product_id, write_item_id, both_ids
+import sys
+import os
+myDir = os.getcwd()
+sys.path.append(myDir)
+from pathlib import Path
+path = Path(myDir)
+a=str(path.parent.absolute())
+sys.path.append(a)
+from app.database import insert_data, create_connection
 from DiscordWebhook import discordWebhook
 from selenium.webdriver.common.by import By
 import time
@@ -45,6 +54,9 @@ def main():
         both_ids(product_id, data_catentry)
         #Sends the information to the Discord Webhook
         discordWebhook(url, name, price, image, discount, limited_offer, stock)
+        create_connection()
+        insert_data(url, name, price, image, discount, limited_offer, stock)
+
          
 def get_price(driver):
     price_element = None

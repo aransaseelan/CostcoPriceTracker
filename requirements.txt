@@ -5,3 +5,4 @@ fastapi==0.115.4
 python-dotenv==1.0.1
 selenium-base==4.32.10
 tls-client==1.0.1
+SQLAlchemy==2.0.36
