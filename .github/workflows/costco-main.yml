@@ -24,11 +24,11 @@ jobs:
       with:
         python-version: '3.13.0'  # Specify the Python version to use
 
-    - name: Install Google Chrome and ChromeDriver
+    - name: Install Google Chrome
       uses: browser-actions/setup-chrome@v1
       with:
           chrome-version: 120
-          install-chromedriver: true
+          install-dependencies: true
 
     - name: Install Python dependencies
       run: pip3 install -r requirements.txt
