@@ -6,3 +6,5 @@ python-dotenv==1.0.1
 selenium-base==4.32.10
 tls-client==1.0.1
 SQLAlchemy==2.0.36
+streamlit==1.41.0
+streamlit-sqlalchemy==0.2.4

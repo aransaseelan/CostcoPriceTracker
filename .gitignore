@@ -9,3 +9,4 @@ __pycache__/
 .env_yahoo
 .DS_store
 *.db
+__init__.py
