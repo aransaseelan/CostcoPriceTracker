@@ -1,0 +1,185 @@
+openapi: 3.0.3
+info:
+  version: 1.0.0
+  title: Costco API
+  description: >
+    This API allows interaction with Costco items database. Users can add new items by specifying an item ID via a PUT request, and can retrieve all items via a GET request. Certain fields such as `limited_offer` and `stock` are boolean values, `original_price` and `discount_price` are integers, and various other attributes store metadata about the item. When a new item is initially added with minimal information (just the ID), further details will be automatically filled in by a GitHub Actions workflow at a later time.
+
+servers:
+  - url: http://localhost:8080
+    description: Local development server
+
+tags:
+  - name: Items
+    description: Operations related to Costco items
+
+paths:
+  /items:
+    get:
+      summary: Retrieve a list of all items
+      description: >
+        Returns all items currently stored in the database.  
+        Supports optional query parameters for filtering (e.g., by stock, limited_offer, or by a price range).
+      tags:
+        - Items
+      parameters:
+        - in: query
+          name: stock
+          schema:
+            type: boolean
+          description: Filter items by stock availability (true or false).
+        - in: query
+          name: limited_offer
+          schema:
+            type: boolean
+          description: Filter items by whether they are a limited offer (true or false).
+        - in: query
+          name: min_original_price
+          schema:
+            type: integer
+          description: Filter items with original_price >= min_original_price.
+        - in: query
+          name: max_original_price
+          schema:
+            type: integer
+          description: Filter items with original_price <= max_original_price.
+        - in: query
+          name: min_discount_price
+          schema:
+            type: integer
+          description: Filter items with discount_price >= min_discount_price.
+        - in: query
+          name: max_discount_price
+          schema:
+            type: integer
+          description: Filter items with discount_price <= max_discount_price.
+        - in: query
+          name: min_discount_ratio
+          schema:
+            type: integer
+          description: Filter items with discount_ratio >= min_discount_ratio.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      example: 1
+                    url:
+                      type: string
+                      example: "https://www.costco.ca/.product.5351006.html"
+                    name:
+                      type: string
+                      example: "Apple MacBook Pro 16.2 in., Apple M4 Max Chip - 36 GB RAM, 1 TB SSD, Space Black"
+                    image:
+                      type: string
+                      example: "https://bfasset.costco-static.com/U447IH35/at/6wwfn5rhh575kwpt67mjf8p/4000290732-894__1.jpg"
+                    original_price:
+                      type: number
+                      format: float
+                      example: 4639.99
+                    discount_price:
+                      type: number
+                      format: float
+                      example: 0
+                    ratio:
+                      type: number
+                      format: float
+                      example: 0
+                    limited_offer:
+                      type: boolean
+                      example: true
+                    stock:
+                      type: boolean
+                      example: true
+                    created_date:
+                      type: string
+                      format: date-time
+                      example: "2024-12-13T00:00:00Z"
+        '400':
+          description: Bad Request
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
+
+    put:
+      summary: Add (or update) an item by ID
+      description: >
+        Inserts a new item into the database with the specified item ID.  
+        Initially, other fields may be null or missing. A GitHub Actions workflow will later populate additional fields.  
+        If an item with the given ID already exists, it may be updated.
+      tags:
+        - Items
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: integer
+                  description: The ID of the item to be inserted or updated
+                  example: 5351006
+      responses:
+        '201':
+          description: Item successfully added or updated.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    example: 5351006
+        '400':
+          description: Invalid input.
+        '500':
+          description: Database error.
+
+components:
+  schemas:
+    Item:
+      type: object
+      properties:
+        id:
+          type: integer
+        url:
+          type: string
+          maxLength: 255
+        name:
+          type: string
+          maxLength: 255
+        image:
+          type: string
+          maxLength: 255
+        original_price:
+          type: integer
+        ratio:
+          type: integer
+        discount_price:
+          type: integer
+        limited_offer:
+          type: boolean
+        stock:
+          type: boolean
+        created_date:
+          type: string
+          format: date-time
+      required:
+        - id
+        - url
+        - name
+        - image
+        - original_price
+        - discount_price
+        - ratio
+        - limited_offer
+        - stock
