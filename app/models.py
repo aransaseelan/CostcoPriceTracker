@@ -1,12 +1,11 @@
-import streamlit as st
 from sqlalchemy import create_engine, Column, Integer, String, DateTime, func
-from sqlalchemy.orm import sessionmaker, declarative_base
-from streamlit_sqlalchemy import StreamlitAlchemyMixin
+from sqlalchemy.orm import declarative_base
 
 Base = declarative_base()
 
-class CostcoDatabase(Base, StreamlitAlchemyMixin):
-    __tablename__ = 'costcodatabase'
+class Items(Base):
+
+    __tablename__ = 'items'
     id = Column(Integer, primary_key=True, autoincrement=True)
     url = Column(String(255), nullable=True)
     name = Column(String(255), nullable=True)
