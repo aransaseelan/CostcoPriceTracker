@@ -4,32 +4,37 @@ from typing import Optional, List
 from .models import Items
 from .schemas import ItemBase, ItemFilters
 
-def get_items( db: Session, filters: ItemFilters) -> List[Items]:
+def get_items(db: Session, filters: ItemFilters) -> List[ItemResponse]:
     query = db.query(Items)
 
-    if stock is not None:
-        query = query.filter(Items.stock == stock)
-    if limited_offer is not None:
-        query = query.filter(Items.limited_offer == limited_offer)
-    if min_original_price is not None:
-        query = query.filter(Items.original_price >= min_original_price)
-    if max_original_price is not None:
-        query = query.filter(Items.original_price <= max_original_price)
-    if min_discount_price is not None:
-        query = query.filter(Items.discount_price >= min_discount_price)
-    if max_discount_price is not None:
-        query = query.filter(Items.discount_price <= max_discount_price)
+    if filters.stock is not None:
+        query = query.filter(Items.stock == filters.stock)
+    
+    if filters.limited_offer is not None:
+        query = query.filter(Items.limited_offer == filters.limited_offer)
+    
+    if filters.min_original_price is not None:
+        query = query.filter(Items.original_price >= filters.min_original_price)
+    
+    if filters.max_original_price is not None:
+        query = query.filter(Items.original_price <= filters.max_original_price)
+    
+    if filters.min_discount_price is not None:
+        query = query.filter(Items.discount_price >= filters.min_discount_price)
+    
+    if filters.max_discount_price is not None:
+        query = query.filter(Items.discount_price <= filters.max_discount_price)
 
-    return query.all()
+    items = query.all()
+    return [ItemResponse.from_orm(item) for item in items]
 
 def create_item(db: Session, item_data: ItemBase) -> Items:
-    # Check if item with given ID already exists
-    existing_item = db.query(Items).filter(Items.id == item_data.id).first()
+    existing_item = db.query(Items).filter(Items.item_id == item_data.item_id).first()
     if existing_item:
         return None
 
     new_item = Items(
-        id=item_data.id,
+        item_id=item_data.item_id,
         url=None,
         name=None,
         image=None,
@@ -41,4 +46,4 @@ def create_item(db: Session, item_data: ItemBase) -> Items:
     db.add(new_item)
     db.commit()
     db.refresh(new_item)
-    return new_item
+    return ItemBase.from_orm(new_item)
