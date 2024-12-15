@@ -10,5 +10,4 @@ app = FastAPI(
     description="An API for interacting with Costco items database."
 )
 
-
 app.include_router(router)

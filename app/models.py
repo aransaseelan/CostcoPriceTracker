@@ -7,6 +7,7 @@ class Items(Base):
 
     __tablename__ = 'items'
     id = Column(Integer, primary_key=True, autoincrement=True)
+    item_id = Column(String(25), nullable=True)
     url = Column(String(255), nullable=True)
     name = Column(String(255), nullable=True)
     image = Column(String(255), nullable=True)
