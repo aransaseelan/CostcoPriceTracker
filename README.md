@@ -25,7 +25,8 @@ This Python script tracks product prices on Costco's website and sends updates v
 ## Usage
 
 1. Add your product IDs to the `IDs.txt` file, one ID per line.
-2. Run the script
+2. Set up the `.env` with two webhooks. One being WEBHOOKNOSALE - (Sends all products) and the other being WEBHOOKSALE - (Products on sale or clearance or special price)
+3. Run the script
 
     ```sh
     python App.py
