@@ -85,8 +85,12 @@ def limited_time_offer(driver):
         return False
 
 def get_name(driver):
-    name_element = driver.find_element(By.CSS_SELECTOR, 'h1[itemprop="name"]')
-    print(name_element.text)
+    try:
+        name_element = driver.find_element(By.CLASS_NAME, 'product-title')
+        print(name_element.text)
+    except NoSuchElementException:
+        print("Name not found")
+        name_element = "Name not found"
     return name_element.text
 
 def get_discount(driver):
