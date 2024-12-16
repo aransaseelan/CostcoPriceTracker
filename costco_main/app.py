@@ -32,7 +32,7 @@ def main():
         except WebDriverException:
             print("WebDriverException occurred. Retrying...")
             driver.get(url)
-    
+
         time.sleep(8)
         name = get_name(driver)
         image = get_image(driver)
@@ -44,12 +44,12 @@ def main():
         data_catentry = get_item_id(driver)
         both_ids(product_id, data_catentry)
         #Sends the information to the Discord Webhook
-        discordWebhook(url, name, price, image, discount, limited_offer, stock)
+        discordWebhook(url, name, price, image, discount, limited_offer, stock, counter)
+        
          
 def get_price(driver):
     price_element = None
-    price_text = ''
-    
+    price_text = 'NO PRICE FOUND'
     try:
         price_element = driver.find_element(By.CSS_SELECTOR, 'span[automation-id="productPriceOutput"]')
         price_text = price_element.text
@@ -63,7 +63,8 @@ def get_price(driver):
                 WebDriverWait(driver, 20).until_not(EC.text_to_be_present_in_element((By.CSS_SELECTOR, 'span[automation-id="productPriceOutput"]'), '- -.- -'))
                 price_element = driver.find_element(By.CSS_SELECTOR, 'span[automation-id="productPriceOutput"]')
             price_text = price_element.text
-    except (NoSuchElementException, ElementNotInteractableException):        print("Price not found")
+    except (NoSuchElementException, ElementNotInteractableException):        
+        pass
     print(price_text)
     return price_text
     
@@ -72,9 +73,10 @@ def get_image(driver):
     try:
         image_element = driver.find_element(By.ID, 'initialProductImage')
         print(image_element.get_attribute('src'))
+        return image_element.get_attribute('src')
     except NoSuchElementException:
         print("Image element not found")
-    return image_element.get_attribute('src')
+        return "Image element not found"
    
 def limited_time_offer(driver):
     try:
@@ -86,12 +88,14 @@ def limited_time_offer(driver):
 
 def get_name(driver):
     try:
-        name_element = driver.find_element(By.CLASS_NAME, 'product-title')
+        WebDriverWait(driver,2).until(EC.presence_of_element_located((By.CSS_SELECTOR, 'h1[itemprop="name"]'))) 
+        name_element = driver.find_element(By.CSS_SELECTOR, 'h1[itemprop="name"]')
         print(name_element.text)
-    except NoSuchElementException:
+        return name_element.text
+    except (NoSuchElementException, TimeoutException, ElementNotInteractableException):
         print("Name not found")
         name_element = "Name not found"
-    return name_element.text
+        return name_element
 
 def get_discount(driver):
     # Scrap the amount discount
@@ -121,7 +125,7 @@ def check_stock(driver):
             return "In stock"
         else:
             return "Out of stock"
-    except NoSuchElementException:
+    except NoSuchElementException or Exception as e:
         print("Stock not found")
         return "No element Found"
 
@@ -166,7 +170,7 @@ def get_item_id(driver):
         print(item_id)
         write_item_id(item_id)
         return item_id
-    except NoSuchElementException:
+    except NoSuchElementException or Exception as e:
         print("Item Id not found")
         return ""
 

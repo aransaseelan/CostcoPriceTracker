@@ -19,29 +19,30 @@ def discordWebhook(url, name, price, image, discount, limited_offer, stock):
         post_to_discord(webhooks[1], url, name, price, image, discount, stock)
 
 def post_to_discord(webhook_url, url, name, price, image, discount, stock):
-    webhook = DiscordWebhook(url=webhook_url)
-    # create embed object for webhook
-    embed = DiscordEmbed(title=stock, description=price, color="03b2f8")
+        webhook = DiscordWebhook(url=webhook_url)
+        # create embed object for webhook
+        embed = DiscordEmbed(title=stock, description=price, color="03b2f8")
 
-    # set author
-    embed.set_author(name=name, url=url, icon_url=url)
+        # set author
+        embed.set_author(name=name, url=url, icon_url=url)
 
-    # set image with the provided link
-    embed.set_image(url=url)
+        # set image with the provided link
+        embed.set_image(url=url)
 
-    # set thumbnail with the same or different image
-    embed.set_thumbnail(url=image)
+        # set thumbnail with the same or different image
+        embed.set_thumbnail(url=image)
+        
+        embed.add_embed_field(name="Discount", value=discount)
+        
+        # set footer
+        embed.set_footer(text="Aran Saseelan Bot", icon_url=url)
+
+        # set timestamp (default is now) accepted types are int, float and datetime
+        embed.set_timestamp()
+
+        # add embed object to webhook
+        webhook.add_embed(embed)
+
+        # execute the webhook
+        webhook.execute()
     
-    embed.add_embed_field(name="Discount", value=discount)
-    
-    # set footer
-    embed.set_footer(text="Aran Saseelan Bot", icon_url=url)
-
-    # set timestamp (default is now) accepted types are int, float and datetime
-    embed.set_timestamp()
-
-    # add embed object to webhook
-    webhook.add_embed(embed)
-
-    # execute the webhook
-    webhook.execute()
