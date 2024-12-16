@@ -44,7 +44,7 @@ def main():
         data_catentry = get_item_id(driver)
         both_ids(product_id, data_catentry)
         #Sends the information to the Discord Webhook
-        discordWebhook(url, name, price, image, discount, limited_offer, stock, counter)
+        discordWebhook(url, name, price, image, discount, limited_offer, stock)
         
          
 def get_price(driver):
