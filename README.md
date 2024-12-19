@@ -1,7 +1,8 @@
 <img width="263" alt="IMG_0671" src="https://github.com/aransaseelan/CostcoPriceTracker/assets/56369881/978e075d-e947-40bc-a8fd-45c90697cc52">
 
-As of December 18th 2024
+As of December 18th 2024. This gives you an overview of how the project works:
 https://www.youtube.com/watch?v=AlT_DVpu20c&ab_channel=AranSaseelan
+
 
 
 This Python script tracks product prices on Costco's website and sends updates via Discord Webhook.
