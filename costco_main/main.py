@@ -7,7 +7,6 @@ from pathlib import Path
 path = Path(myDir)
 a=str(path.parent.absolute())
 sys.path.append(a)
-from app.database import insert_data, create_connection
 from DiscordWebhook import discordWebhook
 from selenium.webdriver.common.by import By
 import time

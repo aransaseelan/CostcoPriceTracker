@@ -1,5 +1,5 @@
 
-from discord_webhook import DiscordWebhook, DiscordEmbed 
+from discord_webhook import DiscordWebhook, DiscordEmbed
 from dotenv import load_dotenv
 import os 
 
@@ -22,6 +22,7 @@ def discordWebhook(url, name, price, image, discount, limited_offer, stock):
 def post_to_discord(webhook_url, url, name, price, image, discount, stock):
     webhook = DiscordWebhook(url=webhook_url)
 
+    embed = DiscordEmbed()
     # set author
     embed.set_author(name=name, url=url, icon_url=url)
 
