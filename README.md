@@ -1,5 +1,9 @@
 <img width="263" alt="IMG_0671" src="https://github.com/aransaseelan/CostcoPriceTracker/assets/56369881/978e075d-e947-40bc-a8fd-45c90697cc52">
 
+As of December 18th 2024
+https://www.youtube.com/watch?v=AlT_DVpu20c&ab_channel=AranSaseelan
+
+
 This Python script tracks product prices on Costco's website and sends updates via Discord Webhook.
 
 ## Feature
@@ -52,13 +56,14 @@ through the Selenium UC framework, but this is can
 be clipped or banned at any time. 
 
 
-## Hosting 
+## Future Additions 
 
 Currently in using docker, azure, and streamlit to give
 it a frontend to users. Users can see what im
 tracking and the goal is that it would be portable 
 and users can make their own dashboard with an oauth
 login.
+
 ## Contributing
 
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
