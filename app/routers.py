@@ -9,10 +9,10 @@ from .models import Items
 
 router = APIRouter()
 
-@router.get("/items", response_model=ItemResponse)
+@router.get("/items", response_model=List[ItemResponse])  
 def read_items(db: Session = Depends(get_db), filters: ItemFilters = Depends()):
     items = crud.get_items(db, filters)
-    return items
+    return items  
 
 @router.post("/items", response_model=ItemBase, status_code=201)
 def add_item(item_data: ItemBase, db: Session = Depends(get_db)):

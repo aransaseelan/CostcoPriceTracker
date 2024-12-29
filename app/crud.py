@@ -2,9 +2,9 @@ from sqlalchemy.orm import Session
 from typing import Optional, List
 
 from .models import Items
-from .schemas import ItemBase, ItemFilters
+from .schemas import ItemBase, ItemFilters, ItemResponse
 
-def get_items(db: Session, filters: ItemFilters) -> List[ItemResponse]:
+def get_items(db: Session, filters: ItemFilters):
     query = db.query(Items)
 
     if filters.stock is not None:
