@@ -1,4 +1,5 @@
-from discord_webhook import DiscordWebhook, DiscordEmbed 
+
+from discord_webhook import DiscordWebhook, DiscordEmbed
 from dotenv import load_dotenv
 import os 
 
@@ -20,9 +21,8 @@ def discordWebhook(url, name, price, image, discount, limited_offer, stock):
 
 def post_to_discord(webhook_url, url, name, price, image, discount, stock):
     webhook = DiscordWebhook(url=webhook_url)
-    # create embed object for webhook
-    embed = DiscordEmbed(title=stock, description=price, color="03b2f8")
 
+    embed = DiscordEmbed()
     # set author
     embed.set_author(name=name, url=url, icon_url=url)
 
@@ -31,8 +31,9 @@ def post_to_discord(webhook_url, url, name, price, image, discount, stock):
 
     # set thumbnail with the same or different image
     embed.set_thumbnail(url=image)
-    
+    embed.add_embed_field(name="Price", value=price)
     embed.add_embed_field(name="Discount", value=discount)
+    embed.add_embed_field(name="Stock", value=stock)
     
     # set footer
     embed.set_footer(text="Aran Saseelan Bot", icon_url=url)
@@ -43,5 +44,4 @@ def post_to_discord(webhook_url, url, name, price, image, discount, stock):
     # add embed object to webhook
     webhook.add_embed(embed)
 
-    # execute the webhook
     webhook.execute()
