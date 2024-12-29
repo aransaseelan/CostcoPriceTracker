@@ -23,4 +23,4 @@ __pycache__/
 .env_yahoo
 .DS_store
 *.db
->>>>>>> main
+__init__.py
