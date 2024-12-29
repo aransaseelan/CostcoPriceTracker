@@ -53,8 +53,6 @@ def main():
         both_ids(product_id, data_catentry)
         #Sends the information to the Discord Webhook
         discordWebhook(url, name, price, image, discount, limited_offer, stock)
-        create_connection()
-        insert_data(url, name, price, image, discount, limited_offer, stock)
 
          
 def get_price(driver):
