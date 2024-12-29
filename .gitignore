@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 venv/
 .env
 *.pyc
@@ -10,3 +11,16 @@ __pycache__/
 .DS_store
 *.db
 __init__.py
+=======
+venv/
+.env
+*.pyc
+footlocker/
+downloaded_files/
+__pycache__/
+.env_stockx
+*.csv
+.env_yahoo
+.DS_store
+*.db
+>>>>>>> main

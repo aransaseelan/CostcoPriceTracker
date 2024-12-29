@@ -50,6 +50,14 @@ the request-based module. It uses a TLS fingerprint
 through the Selenium UC framework, but this is can 
 be clipped or banned at any time. 
 
+
+## Hosting 
+
+Currently in using docker, azure, and streamlit to give
+it a frontend to users. Users can see what im
+tracking and the goal is that it would be portable 
+and users can make their own dashboard with an oauth
+login.
 ## Contributing
 
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
