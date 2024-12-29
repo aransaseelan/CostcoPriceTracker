@@ -38,4 +38,4 @@ jobs:
         WEBHOOKNOSALE: ${{ secrets.WEBHOOKNOSALE }}
         WEBHOOKSALE: ${{ secrets.WEBHOOKSALE }}
       run: 
-        python costco_main/app.py
+        python costco_main/main.py
