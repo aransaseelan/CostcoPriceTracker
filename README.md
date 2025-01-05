@@ -1,6 +1,6 @@
 <img width="263" alt="IMG_0671" src="https://github.com/aransaseelan/CostcoPriceTracker/assets/56369881/978e075d-e947-40bc-a8fd-45c90697cc52">
 
-This Python script tracks product prices on Costco's website and sends updates via Discord Webhook.
+This Python script enables tracking of product prices on Costco's website using product IDs and sends updates to a specified Discord channel via Webhook.
 
 ## Feature
 
@@ -11,6 +11,11 @@ This Python script tracks product prices on Costco's website and sends updates v
 ## Installation
 
 1. Clone the repository to your local machine.
+        '''
+        git clone https://github.com/aransaseelan/CostcoPriceTracker.git
+        cd CostcoPriceTracker
+        '''
+
 2. Create a venv 
     ```sh
     python3 -m venv venv
@@ -25,6 +30,8 @@ This Python script tracks product prices on Costco's website and sends updates v
 ## Usage
 
 1. Add your product IDs to the `IDs.txt` file, one ID per line.
+2. Specify your two webhooks being products with no sale and products on sale. This will send 
+items not on sale to one webhook and items on sale to another. 
 2. Run the script
 
     ```sh
@@ -48,16 +55,8 @@ resources, so if you need a fast way to gather information, the request-based mo
 The IP addresses are also more likely to get banned through
 the request-based module. It uses a TLS fingerprint 
 through the Selenium UC framework, but this is can 
-be clipped or banned at any time. 
+be clipped/banned at any time. 
 
-
-## Hosting 
-
-Currently in using docker, azure, and streamlit to give
-it a frontend to users. Users can see what im
-tracking and the goal is that it would be portable 
-and users can make their own dashboard with an oauth
-login.
 ## Contributing
 
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
