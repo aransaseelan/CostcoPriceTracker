@@ -1,9 +1,22 @@
 
 # Costco Price Tracker <img width="75" alt="IMG_0671" src="https://github.com/aransaseelan/CostcoPriceTracker/assets/56369881/978e075d-e947-40bc-a8fd-45c90697cc52">
 
+This is a project that enables tracking of product prices on Costco's website using product IDs and sends updates to a specified Discord channel via Webhook.
 
-This Python script enables tracking of product prices on Costco's website using product IDs and sends updates to a specified Discord channel via Webhook.
+## Inspiration
 
+While shopping on Amazon, I consistently used a browser extension to monitor discounts on products. Appreciating Costco's exceptional return policies and their excellent balance of price and quality, I sought a similar tool for their platform. When I discovered that no such extension existed, I decided to create one myself.
+
+## How is it Built
+
+- Programming Languages & Frameworks: Python, FastAPI
+- Databases: PostgreSQL for storing historical price data
+- Web Scraping Tools: Selenium and Selenium UC framework, API Reverse Engineering
+- Continuous Deployment: GitHub Actions for automation and deployment
+
+## Challenges I ran into 
+
+- 
 ## Features
 - Reads product IDs from a file and generates corresponding Costco URLs
 - Retrieves product information such as name, price, image, stock, and discount
