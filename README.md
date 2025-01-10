@@ -14,9 +14,6 @@ While shopping on Amazon, I consistently used a browser extension to monitor dis
 - Web Scraping Tools: Selenium and Selenium UC framework, API Reverse Engineering
 - Continuous Deployment: GitHub Actions for automation and deployment
 
-## Challenges I ran into 
-
-- 
 ## Features
 - Reads product IDs from a file and generates corresponding Costco URLs
 - Retrieves product information such as name, price, image, stock, and discount
