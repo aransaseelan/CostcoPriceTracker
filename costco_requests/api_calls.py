@@ -1,5 +1,5 @@
 import tls_client
-import json 
+import requests 
 import logging as logger
 import time
 import random
@@ -14,15 +14,20 @@ class api_calls:
     def get_price(productId: str, itemID: str):
         try: 
             price_api = f"https://www.costco.ca/AjaxGetContractPrice?itemId={itemID}&productId={productId}"
+            cookies= {
+                'invCheckStateCode': 'ON',
+                'invCheckPostalCode': 'M1T%203C4',
+                'invCheckCity': 'Scarborough',
+                'STORELOCATION': '{%22storeLocation%22:{%22zip%22:%22M3K%202C8%22%2C%22city%22:%22Downsview%22}}'
+            }
             session = tls_client.Session(
                 client_identifier="chrome112",
                 random_tls_extension_order=True
             )
-            response = session.get(
-                price_api
-            )
+            response = session.get(price_api, cookies=cookies)
             print(response.text)
             logger.info(f"Price for product ID: {productId} is {response.text}")
+            print(price_api)
             time.sleep(random.randint(1, 5))
         except requests.exceptions.RequestException as e:
             logger.error(f"Error: {e}")
