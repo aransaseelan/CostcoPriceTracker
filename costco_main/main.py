@@ -1,4 +1,4 @@
-from helper import FileReader, getUrl, write_product_id, write_item_id, both_ids
+from helper import FileReader, getUrl, both_ids
 import sys
 import os
 myDir = os.getcwd()
@@ -156,7 +156,6 @@ def get_product_id(driver, timeout=10):
         product_id = [element.get_attribute("value") for element in product_id]
         
         print(product_id)
-        write_product_id(product_id[0])
         return product_id
     except Exception as e:
         logger.info(f"Product IDs not found - {e}")
@@ -170,7 +169,6 @@ def get_item_id(driver):
         # Extract the data-catentry attribute value
         item_id = div_element.get_attribute('data-catentry')
         print(item_id)
-        write_item_id(item_id)
         return item_id
     except NoSuchElementException:
         print("Item Id not found")

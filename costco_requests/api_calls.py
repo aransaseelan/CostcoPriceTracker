@@ -29,3 +29,5 @@ class api_calls:
             time.sleep(random.randint(1, 5))
         except requests.exceptions.RequestException as e:
             logger.error(f"Error: {e}")
+            
+            
