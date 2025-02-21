@@ -21,3 +21,10 @@ def add_item(item_data: ItemBase, db: Session = Depends(get_db)):
         raise HTTPException(status_code=400, detail="Item with this ID already exists")
     return new_item
 
+@router.put("/items/{item_id}", response_model=ItemBase)
+def update_item(item_id: str, item_data: ItemBase, db: Session = Depends(get_db)):
+    updated_item = crud.update_item(db, item_id, item_data)
+    if not updated_item:
+        raise HTTPException(status_code=404, detail="Item not found")
+    return updated_item
+

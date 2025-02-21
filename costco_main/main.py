@@ -7,6 +7,8 @@ from pathlib import Path
 path = Path(myDir)
 a=str(path.parent.absolute())
 sys.path.append(a)
+
+from sqlalchemy.orm import Session
 from DiscordWebhook import discordWebhook
 from selenium.webdriver.common.by import By
 import time
@@ -55,7 +57,10 @@ def main():
         #Sends the information to the Discord Webhook
         discordWebhook(url, name, price, image, discount, limited_offer, stock)
 
-         
+ 
+def update_product_price(db: Session, product_id: str, item_id: str, price: float):
+    
+     
 def get_price(driver):
     price_element = None
     price_text = ''

@@ -47,3 +47,15 @@ def create_item(db: Session, item_data: ItemBase) -> Items:
     db.commit()
     db.refresh(new_item)
     return ItemBase.from_orm(new_item)
+
+def update_item(db: Session, item_id: str, item_data: ItemBase) -> Optional[ItemBase]:
+    existing_item = db.query(Items).filter(Items.item_id == item_id).first()
+    if not existing_item:
+        return None
+
+    for key, value in item_data.dict(exclude_unset=True).items():
+        setattr(existing_item, key, value)
+    
+    db.commit()
+    db.refresh(existing_item)
+    return ItemBase.from_orm(existing_item)
