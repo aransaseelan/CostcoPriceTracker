@@ -28,7 +28,6 @@ def main():
     Urls = getUrl(productID)
 
     options = webdriver.ChromeOptions()
-    options.add_argument("--headless")
     options.add_argument('--ignore-certificate-errors')
     options.add_argument('--ignore-ssl-errors')
     options.add_argument('--ignore-certificate-errors-spki-list')
@@ -59,7 +58,7 @@ def main():
 
  
 def update_product_price(db: Session, product_id: str, item_id: str, price: float):
-    
+    return 0
      
 def get_price(driver):
     price_element = None
