@@ -99,6 +99,7 @@ def limited_time_offer(driver):
         return False
 
 def get_name(driver):
+    WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, 'h1[itemprop="name"]')))
     name_element = driver.find_element(By.CSS_SELECTOR, 'h1[itemprop="name"]')
     print(name_element.text)
     return name_element.text

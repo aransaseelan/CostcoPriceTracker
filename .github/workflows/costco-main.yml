@@ -11,7 +11,7 @@ on:
 
 jobs:
   run-script:
-    runs-on: windows-latest  # Use the latest Windows runner
+    runs-on: macos-latest 
     environment: Github Actions
 
     steps:
