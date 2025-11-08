@@ -13,6 +13,7 @@ __pycache__/
 __init__.py
 =======
 venv/
+.venv/
 .env
 *.pyc
 footlocker/
