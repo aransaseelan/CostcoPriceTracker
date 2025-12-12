@@ -1,4 +1,4 @@
-from helper import FileReader, getUrl, both_ids
+from helper import FileReader, getUrl, both_ids, read_costco_urls
 import sys
 import os
 myDir = os.getcwd()
@@ -8,11 +8,12 @@ path = Path(myDir)
 a=str(path.parent.absolute())
 sys.path.append(a)
 
-from sqlalchemy.orm import Session
+import random
 from DiscordWebhook import discordWebhook
 from selenium.webdriver.common.by import By
 import time
 import logging as logger
+import requests
 from selenium import webdriver
 from selenium.common.exceptions import WebDriverException
 from selenium.webdriver.support.ui import WebDriverWait
@@ -21,45 +22,117 @@ from selenium.webdriver.common.by import By
 from selenium.common.exceptions import NoSuchElementException, TimeoutException, ElementNotInteractableException
 
 
-def main():
-    
-    #Reads products IDs from file and sets them into a Costco URL
-    productID = FileReader()
-    Urls = getUrl(productID)
+def load_proxies():
+    proxies_path = Path(__file__).resolve().parent.parent / "proxies.txt"
+    if not proxies_path.exists():
+        return []
+    with open(proxies_path, "r") as f:
+        raw = [line.strip() for line in f if line.strip()]
+    user = os.getenv("COSTCO_PROXY_USER")
+    password = os.getenv("COSTCO_PROXY_PASS")
+    if user and password:
+        enriched = []
+        for p in raw:
+            if "@" in p:
+                enriched.append(p)
+                continue
+            if "://" in p:
+                scheme, rest = p.split("://", 1)
+            else:
+                scheme, rest = "http", p
+            enriched.append(f"{scheme}://{user}:{password}@{rest}")
+        return enriched
+    return raw
 
+
+def validate_proxy(proxy: str) -> bool:
+    if not proxy:
+        return True
+    try:
+        resp = requests.get(
+            "https://www.costco.ca/favicon.ico",
+            proxies={"http": proxy, "https": proxy},
+            timeout=8,
+        )
+        resp.raise_for_status()
+        return True
+    except Exception as e:
+        print(f"Proxy validation failed ({proxy}): {e}")
+        return False
+
+
+def build_driver(proxy=None):
     options = webdriver.ChromeOptions()
     options.add_argument('--ignore-certificate-errors')
     options.add_argument('--ignore-certificate-errors-spki-list')
     options.add_argument('--ignore-ssl-errors')
-    options.add_argument('--headless')
     options.add_argument('--no-sandbox')
+    options.add_argument('--disable-http2')
+    options.add_argument('--disable-quic')
     options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36")
+    if proxy:
+        options.add_argument(f'--proxy-server={proxy}')
+        print(f"Routing traffic through proxy: {proxy}")
+    options.add_experimental_option('excludeSwitches', ['enable-automation'])
+    options.add_experimental_option('useAutomationExtension', False)
+    return webdriver.Chrome(options=options)
 
-    driver = webdriver.Chrome(options=options)
+
+def main():
+    
+    # Prefer explicit URLs from costco_urls.txt; fall back to ID-based URLs
+    Urls = read_costco_urls()
+    if not Urls:
+        productID = FileReader()
+        Urls = getUrl(productID)
+
+    use_local = os.getenv("COSTCO_USE_LOCAL", "").lower() in ("1", "true", "yes")
+    if use_local:
+        proxies = [None]
+        print("Forcing local IP (no proxy).")
+    else:
+        proxies = load_proxies()
+        manual_proxy = os.getenv("COSTCO_PROXY")
+        if manual_proxy:
+            proxies = [manual_proxy]
+        elif not proxies:
+            proxies = [None]
+        else:
+            proxies = [p for p in proxies if validate_proxy(p)]
+            if not proxies:
+                proxies = [None]
     
     for url in Urls:
-        try:
-            driver.get(url)
-        except WebDriverException:
-            print("WebDriverException occurred. Retrying...")
-            driver.get(url)
-    
-        time.sleep(8)
-        name = get_name(driver)
-        image = get_image(driver)
-        price = get_price(driver)
-        discount = get_discount(driver)
-        limited_offer = limited_time_offer(driver)
-        stock = check_stock(driver)
-        product_id = get_product_id(driver)
-        data_catentry = get_item_id(driver)
-        both_ids(product_id, data_catentry)
-        #Sends the information to the Discord Webhook
-        discordWebhook(url, name, price, image, discount, limited_offer, stock)
+        random.shuffle(proxies)
+        last_error = None
+        loaded = False
+        for proxy in proxies:
+            driver = build_driver(proxy)
+            try:
+                driver.get(url)
+                time.sleep(8)
+                name = get_name(driver)
+                image = get_image(driver)
+                price = get_price(driver)
+                discount = get_discount(driver)
+                limited_offer = limited_time_offer(driver)
+                stock = check_stock(driver)
+                product_id = get_product_id(driver)
+                data_catentry = get_item_id(driver)
+                both_ids(product_id, data_catentry)
+                #Sends the information to the Discord Webhook
+                discordWebhook(url, name, price, image, discount, limited_offer, stock)
+                loaded = True
+                driver.quit()
+                break
+            except (TimeoutException, WebDriverException) as e:
+                last_error = e
+                print(f"Proxy failed ({proxy}): {e}")
+                driver.quit()
+                continue
+        if not loaded:
+            print(f"All proxies failed for {url}. Last error: {last_error}")
 
- 
-def update_product_price(db: Session, product_id: str, item_id: str, price: float):
-    return 0
      
 def get_price(driver):
     price_element = None

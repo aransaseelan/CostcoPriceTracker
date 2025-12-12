@@ -10,7 +10,7 @@ While shopping on Amazon, I consistently used a browser extension to monitor dis
 ## How is it Built
 
 - Programming Languages & Frameworks: Python, FastAPI
-- Databases: PostgreSQL for storing historical price data
+- Storage: In-memory runtime store (no database dependency)
 - Web Scraping Tools: Selenium and Selenium UC framework, API Reverse Engineering
 - Continuous Deployment: GitHub Actions for automation and deployment
 

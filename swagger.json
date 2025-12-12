@@ -3,7 +3,7 @@ info:
   version: 1.0.0
   title: Costco API
   description: >
-    This API allows interaction with Costco items database. Users can add new items by specifying an item ID via a PUT request, and can retrieve all items via a GET request. Certain fields such as `limited_offer` and `stock` are boolean values, `original_price` and `discount_price` are integers, and various other attributes store metadata about the item. When a new item is initially added with minimal information (just the ID), further details will be automatically filled in by a GitHub Actions workflow at a later time.
+    This API allows interaction with an in-memory collection of Costco items (no persistent database). Users can add new items by specifying an item ID via a PUT request, and can retrieve all items via a GET request. Certain fields such as `limited_offer` and `stock` are boolean values, `original_price` and `discount_price` are integers, and various other attributes store metadata about the item. When a new item is initially added with minimal information (just the ID), further details will be automatically filled in by a GitHub Actions workflow at a later time.
 
 servers:
   - url: http://localhost:8080
@@ -18,7 +18,7 @@ paths:
     get:
       summary: Retrieve a list of all items
       description: >
-        Returns all items currently stored in the database.  
+        Returns all items currently stored in the in-memory collection.  
         Supports optional query parameters for filtering (e.g., by stock, limited_offer, or by a price range).
       tags:
         - Items
@@ -112,7 +112,7 @@ paths:
     put:
       summary: Add (or update) an item by ID
       description: >
-        Inserts a new item into the database with the specified item ID.  
+        Adds a new item to the in-memory collection with the specified item ID.  
         Initially, other fields may be null or missing. A GitHub Actions workflow will later populate additional fields.  
         If an item with the given ID already exists, it may be updated.
       tags:
@@ -142,7 +142,7 @@ paths:
         '400':
           description: Invalid input.
         '500':
-          description: Database error.
+          description: Server error.
 
 components:
   schemas:
@@ -188,7 +188,7 @@ info:
   version: 1.0.0
   title: Costco API
   description: >
-    This API allows interaction with Costco items database. Users can add new items by specifying an item ID via a PUT request, and can retrieve all items via a GET request. Certain fields such as `limited_offer` and `stock` are boolean values, `original_price` and `discount_price` are integers, and various other attributes store metadata about the item. When a new item is initially added with minimal information (just the ID), further details will be automatically filled in by a GitHub Actions workflow at a later time.
+    This API allows interaction with an in-memory collection of Costco items (no persistent database). Users can add new items by specifying an item ID via a PUT request, and can retrieve all items via a GET request. Certain fields such as `limited_offer` and `stock` are boolean values, `original_price` and `discount_price` are integers, and various other attributes store metadata about the item. When a new item is initially added with minimal information (just the ID), further details will be automatically filled in by a GitHub Actions workflow at a later time.
 
 servers:
   - url: http://localhost:8080
@@ -203,7 +203,7 @@ paths:
     get:
       summary: Retrieve a list of all items
       description: >
-        Returns all items currently stored in the database.  
+        Returns all items currently stored in the in-memory collection.  
         Supports optional query parameters for filtering (e.g., by stock, limited_offer, or by a price range).
       tags:
         - Items
@@ -297,7 +297,7 @@ paths:
     put:
       summary: Add (or update) an item by ID
       description: >
-        Inserts a new item into the database with the specified item ID.  
+        Adds a new item to the in-memory collection with the specified item ID.  
         Initially, other fields may be null or missing. A GitHub Actions workflow will later populate additional fields.  
         If an item with the given ID already exists, it may be updated.
       tags:
@@ -327,7 +327,7 @@ paths:
         '400':
           description: Invalid input.
         '500':
-          description: Database error.
+          description: Server error.
 
 components:
   schemas:

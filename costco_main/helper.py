@@ -1,4 +1,6 @@
 
+from pathlib import Path
+
 
 def getUrl(productID):
     url = []
@@ -10,6 +12,14 @@ def FileReader():
     with open('costco_main/IDs.txt', 'r') as file:
         productIDs = file.read().splitlines()
     return productIDs
+
+def read_costco_urls():
+    urls_path = Path('costco_main/costco_urls.txt')
+    if not urls_path.exists():
+        return []
+    with open(urls_path, 'r') as file:
+        urls = [line.strip() for line in file if line.strip()]
+    return urls
 
 def both_ids(product_id, item_id):
     combined_id = product_id[0] + ',' + item_id
