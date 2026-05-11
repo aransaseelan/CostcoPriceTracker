@@ -20,6 +20,10 @@ def discordWebhook(url, name, price, image, discount, limited_offer, stock):
         post_to_discord(webhooks[1], url, name, price, image, discount, stock)
 
 def post_to_discord(webhook_url, url, name, price, image, discount, stock):
+    if not webhook_url:
+        print("Discord webhook URL is not configured; skipping webhook post.")
+        return
+
     webhook = DiscordWebhook(url=webhook_url)
 
     embed = DiscordEmbed()

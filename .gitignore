@@ -25,3 +25,4 @@ __pycache__/
 .DS_store
 *.db
 __init__.py
+proxies.txt
