@@ -1,8 +1,18 @@
 from datetime import datetime, timezone
+
+
+
+
+
+
+
+
+
+
 from typing import Any, List, Optional
 
 from . import db
-from .schemas import ItemBase, ItemFilters, ItemResponse
+from .schemas import ItemBase, ItemFilters, ItemResponse, PriceHistoryPoint
 
 
 def _row_to_response(row) -> ItemResponse:
@@ -80,6 +90,36 @@ def get_items(filters: ItemFilters) -> List[ItemResponse]:
         ):
             continue
         out.append(item)
+    return out
+
+
+def get_item_history(item_id: int, limit: int = 200) -> List[PriceHistoryPoint]:
+    sql = """
+        SELECT scraped_at, price, discount, stock
+        FROM price_snapshots
+        WHERE item_id = %s
+        ORDER BY scraped_at ASC
+        LIMIT %s
+    """
+    try:
+        with db.get_conn() as conn, conn.cursor() as cur:
+            cur.execute(sql, (item_id, limit))
+            rows = cur.fetchall()
+    except Exception as e:
+        print(f"DB get_item_history failed: {e}")
+        return []
+
+    out: List[PriceHistoryPoint] = []
+    for scraped_at, price, discount, stock in rows:
+        stock_bool: Optional[bool] = None
+        if stock is not None:
+            stock_bool = stock.strip().lower() == 'in stock'
+        out.append(PriceHistoryPoint(
+            scraped_at=scraped_at or datetime.now(timezone.utc),
+            price=float(price) if price is not None else None,
+            discount=float(discount) if discount is not None else None,
+            stock=stock_bool,
+        ))
     return out
 
 

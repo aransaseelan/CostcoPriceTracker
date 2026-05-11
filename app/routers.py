@@ -1,15 +1,19 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from typing import List
 
-from .schemas import ItemResponse, ItemBase, ItemFilters
+from .schemas import ItemResponse, ItemBase, ItemFilters, PriceHistoryPoint
 from . import crud
 
 router = APIRouter()
 
-@router.get("/items", response_model=List[ItemResponse])  
+@router.get("/items", response_model=List[ItemResponse])
 def read_items(filters: ItemFilters = Depends()):
     items = crud.get_items(filters)
-    return items  
+    return items
+
+@router.get("/items/{item_id}/history", response_model=List[PriceHistoryPoint])
+def read_item_history(item_id: int, limit: int = Query(200, ge=1, le=1000)):
+    return crud.get_item_history(item_id, limit)
 
 @router.post("/items", response_model=ItemBase, status_code=201)
 def add_item(item_data: ItemBase):

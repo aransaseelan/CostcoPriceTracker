@@ -34,4 +34,14 @@ class ItemResponse(BaseModel):
         orm_mode = True
         from_attributes = True
 
-    
+
+class PriceHistoryPoint(BaseModel):
+    scraped_at: datetime
+    price: Optional[float] = None
+    discount: Optional[float] = None
+    stock: Optional[bool] = None
+
+    class Config:
+        orm_mode = True
+        from_attributes = True
+
