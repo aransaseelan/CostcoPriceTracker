@@ -14,12 +14,16 @@ from selenium.webdriver.common.by import By
 import time
 import logging as logger
 import requests
+import re
 from selenium import webdriver
 from selenium.common.exceptions import WebDriverException
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 from selenium.common.exceptions import NoSuchElementException, TimeoutException, ElementNotInteractableException
+
+SEARCH_API_URL = "https://search.costco.ca/api/apps/www_costco_ca/query/www_costco_ca_search"
+SEARCH_API_KEY = "134a4023-68d5-4138-8e03-8353667d5fb3"
 
 
 def load_proxies():
@@ -62,11 +66,24 @@ def validate_proxy(proxy: str) -> bool:
 
 
 def build_driver(proxy=None):
+    headless = os.getenv("COSTCO_HEADLESS", "true").lower() not in ("0", "false", "no")
+    use_uc = os.getenv("COSTCO_USE_UC", "true").lower() not in ("0", "false", "no")
+    if use_uc and not proxy:
+        try:
+            from seleniumbase import Driver
+            return Driver(uc=True, headless=headless, page_load_strategy="normal")
+        except Exception as e:
+            print(f"SeleniumBase UC driver unavailable, falling back to Chrome webdriver: {e}")
+
     options = webdriver.ChromeOptions()
+    if headless:
+        options.add_argument("--headless=new")
+        options.add_argument("--window-size=1440,2200")
     options.add_argument('--ignore-certificate-errors')
     options.add_argument('--ignore-certificate-errors-spki-list')
     options.add_argument('--ignore-ssl-errors')
     options.add_argument('--no-sandbox')
+    options.add_argument('--disable-dev-shm-usage')
     options.add_argument('--disable-http2')
     options.add_argument('--disable-quic')
     options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36")
@@ -78,31 +95,123 @@ def build_driver(proxy=None):
     return webdriver.Chrome(options=options)
 
 
+def get_product_id_from_url(url):
+    patterns = [
+        r"\.product\.(\d+)\.html",
+        r"/(\d+)(?:\?|$)",
+        r"[?&]partNumber=(\d+)",
+    ]
+    for pattern in patterns:
+        match = re.search(pattern, url)
+        if match:
+            return match.group(1)
+    return None
+
+
+def get_search_api_product(url):
+    product_id = get_product_id_from_url(url)
+    if not product_id:
+        return None
+
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36',
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'x-api-key': SEARCH_API_KEY,
+    }
+    try:
+        response = requests.get(
+            SEARCH_API_URL,
+            params={
+                'expoption': 'def',
+                'q': product_id,
+                'locale': 'en-CA',
+                'start': '0',
+                'expand': 'false',
+                'loc': '*',
+                'rows': '5',
+            },
+            headers=headers,
+            timeout=15,
+        )
+        response.raise_for_status()
+    except Exception as e:
+        print(f"Search API lookup failed for {product_id}: {e}")
+        return None
+
+    docs = response.json().get('response', {}).get('docs', [])
+    for doc in docs:
+        if str(doc.get('group_id')) != product_id and str(doc.get('item_number')) != product_id:
+            continue
+        price = doc.get('item_location_pricing_salePrice')
+        if price is None:
+            continue
+        return {
+            'url': f"https://www.costco.ca/p/-/{doc.get('group_id')}",
+            'name': doc.get('item_product_name') or doc.get('item_name') or '',
+            'price': str(price),
+            'image': doc.get('item_product_primary_image') or doc.get('item_collateral_primaryimage') or '',
+            'discount': str(doc.get('item_location_pricing_discountAmount_f') or 0),
+            'limited_offer': any('Limited' in pill for pill in doc.get('item_pill_attributes') or []),
+            'stock': 'In stock' if str(doc.get('item_location_stockStatus', '')).lower() == 'in stock' else 'Out of stock',
+            'product_id': [str(doc.get('group_id') or product_id)],
+            'item_id': str(doc.get('item_number') or doc.get('item_location_itemNumber') or ''),
+        }
+    return None
+
+
+def get_proxies():
+    use_local = os.getenv("COSTCO_USE_LOCAL", "").lower() in ("1", "true", "yes")
+    if use_local:
+        print("Forcing local IP (no proxy).")
+        return [None]
+
+    proxies = load_proxies()
+    manual_proxy = os.getenv("COSTCO_PROXY")
+    if manual_proxy:
+        return [manual_proxy]
+    if not proxies:
+        return [None]
+
+    proxies = [p for p in proxies if validate_proxy(p)]
+    return proxies or [None]
+
+
 def main():
     
     # Prefer explicit URLs from costco_urls.txt; fall back to ID-based URLs
-    Urls = read_costco_urls()
+    env_urls = os.getenv("COSTCO_URLS")
+    Urls = [url.strip() for url in env_urls.split(",") if url.strip()] if env_urls else read_costco_urls()
     if not Urls:
         productID = FileReader()
         Urls = getUrl(productID)
 
-    use_local = os.getenv("COSTCO_USE_LOCAL", "").lower() in ("1", "true", "yes")
-    if use_local:
-        proxies = [None]
-        print("Forcing local IP (no proxy).")
-    else:
-        proxies = load_proxies()
-        manual_proxy = os.getenv("COSTCO_PROXY")
-        if manual_proxy:
-            proxies = [manual_proxy]
-        elif not proxies:
-            proxies = [None]
-        else:
-            proxies = [p for p in proxies if validate_proxy(p)]
-            if not proxies:
-                proxies = [None]
+    proxies = None
     
     for url in Urls:
+        api_product = get_search_api_product(url)
+        if api_product:
+            print(api_product['name'])
+            print(api_product['image'])
+            print(api_product['price'])
+            print(f"Amount discount: {api_product['discount']}")
+            print(api_product['stock'])
+            print(api_product['product_id'])
+            print(api_product['item_id'])
+            both_ids(api_product['product_id'], api_product['item_id'])
+            discordWebhook(
+                api_product['url'],
+                api_product['name'],
+                api_product['price'],
+                api_product['image'],
+                api_product['discount'],
+                api_product['limited_offer'],
+                api_product['stock'],
+            )
+            continue
+
+        if proxies is None:
+            proxies = get_proxies()
         random.shuffle(proxies)
         last_error = None
         loaded = False
@@ -156,13 +265,14 @@ def get_price(driver):
     return price_text
     
 def get_image(driver):
-    image_src = ''
     try:
         image_element = driver.find_element(By.ID, 'initialProductImage')
-        print(image_element.get_attribute('src'))
+        image_src = image_element.get_attribute('src')
+        print(image_src)
+        return image_src
     except NoSuchElementException:
         print("Image element not found")
-    return image_element.get_attribute('src')
+    return ''
    
 def limited_time_offer(driver):
     try:
