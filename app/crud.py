@@ -1,67 +1,92 @@
 from datetime import datetime, timezone
-from typing import List, Optional
+from typing import Any, List, Optional
 
+from . import db
 from .schemas import ItemBase, ItemFilters, ItemResponse
 
-# Simple in-memory store to replace the previous SQLAlchemy database
-_items: List[ItemResponse] = []
-_next_id: int = 1
 
-
-def _matches_filters(item: ItemResponse, filters: ItemFilters) -> bool:
-    if filters.item_id is not None and item.item_id != filters.item_id:
-        return False
-    if filters.stock is not None and item.stock != filters.stock:
-        return False
-    if filters.limited_offer is not None and item.limited_offer != filters.limited_offer:
-        return False
-    if filters.min_original_price is not None:
-        if item.original_price is None or item.original_price < filters.min_original_price:
-            return False
-    if filters.max_original_price is not None:
-        if item.original_price is None or item.original_price > filters.max_original_price:
-            return False
-    if filters.min_discount_price is not None:
-        if item.discount_price is None or item.discount_price < filters.min_discount_price:
-            return False
-    if filters.max_discount_price is not None:
-        if item.discount_price is None or item.discount_price > filters.max_discount_price:
-            return False
-    return True
+def _row_to_response(row) -> ItemResponse:
+    (id_, item_id, url, name, image, price, discount,
+     limited_offer, stock, scraped_at) = row
+    original_price = None
+    discount_price = None
+    if price is not None:
+        discount_price = int(price)
+        original_price = int(price + (discount or 0))
+    stock_bool: Optional[bool] = None
+    if stock is not None:
+        stock_bool = stock.strip().lower() == 'in stock'
+    return ItemResponse(
+        id=id_,
+        item_id=int(item_id) if item_id is not None else None,
+        url=url,
+        name=name,
+        image=image,
+        original_price=original_price,
+        discount_price=discount_price,
+        limited_offer=limited_offer,
+        stock=stock_bool,
+        created_date=scraped_at or datetime.now(timezone.utc),
+    )
 
 
 def get_items(filters: ItemFilters) -> List[ItemResponse]:
-    return [item for item in _items if _matches_filters(item, filters)]
+    sql = """
+        SELECT DISTINCT ON (item_id)
+            id, item_id, url, name, image, price, discount,
+            limited_offer, stock, scraped_at
+        FROM price_snapshots
+        WHERE item_id IS NOT NULL
+    """
+    params: List[Any] = []
+
+    if filters.item_id is not None:
+        sql += " AND item_id = %s"
+        params.append(filters.item_id)
+    if filters.limited_offer is not None:
+        sql += " AND limited_offer = %s"
+        params.append(filters.limited_offer)
+
+    sql += " ORDER BY item_id, scraped_at DESC"
+
+    try:
+        with db.get_conn() as conn, conn.cursor() as cur:
+            cur.execute(sql, params)
+            rows = cur.fetchall()
+    except Exception as e:
+        print(f"DB get_items failed: {e}")
+        return []
+
+    items = [_row_to_response(r) for r in rows]
+
+    out: List[ItemResponse] = []
+    for item in items:
+        if filters.stock is not None and item.stock != filters.stock:
+            continue
+        if filters.min_original_price is not None and (
+            item.original_price is None or item.original_price < filters.min_original_price
+        ):
+            continue
+        if filters.max_original_price is not None and (
+            item.original_price is None or item.original_price > filters.max_original_price
+        ):
+            continue
+        if filters.min_discount_price is not None and (
+            item.discount_price is None or item.discount_price < filters.min_discount_price
+        ):
+            continue
+        if filters.max_discount_price is not None and (
+            item.discount_price is None or item.discount_price > filters.max_discount_price
+        ):
+            continue
+        out.append(item)
+    return out
 
 
 def create_item(item_data: ItemBase) -> Optional[ItemBase]:
-    global _next_id
-
-    if any(item.item_id == item_data.item_id for item in _items):
-        return None
-
-    new_item = ItemResponse(
-        id=_next_id,
-        item_id=item_data.item_id,
-        url=None,
-        name=None,
-        image=None,
-        original_price=None,
-        discount_price=None,
-        limited_offer=None,
-        stock=None,
-        created_date=datetime.now(timezone.utc),
-    )
-    _next_id += 1
-    _items.append(new_item)
-    return ItemBase(item_id=new_item.item_id)
+    # Snapshots are written by the scrapers; this endpoint is a no-op stub.
+    return item_data
 
 
 def update_item(item_id: str, item_data: ItemBase) -> Optional[ItemBase]:
-    for item in _items:
-        if str(item.item_id) == str(item_id):
-            payload = item_data.dict(exclude_unset=True)
-            if "item_id" in payload:
-                item.item_id = payload["item_id"]
-            return ItemBase(item_id=item.item_id)
-    return None
+    return item_data

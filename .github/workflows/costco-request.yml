@@ -31,5 +31,6 @@ jobs:
       env:
         WEBHOOKNOSALE: ${{ secrets.WEBHOOKNOSALE }}
         WEBHOOKSALE: ${{ secrets.WEBHOOKSALE }}
-      run: 
+        DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      run:
         python costco_requests/main.py

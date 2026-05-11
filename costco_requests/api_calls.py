@@ -1,11 +1,15 @@
 import os
 import re
+import sys
 import json
 import tls_client
 import requests
 import logging as logger
 import time
 import random
+
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from app.db import save_snapshot
 
 # Variables 
 logger.basicConfig(level=logger.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -100,8 +104,38 @@ class api_calls:
                 text = json.dumps(result, indent=2)
                 logger.info(f"Search API fallback price for product ID: {productId} is {text}")
                 print(text)
+                save_snapshot(
+                    item_id=result['itemId'],
+                    product_id=result['productId'],
+                    name=result['productName'],
+                    price=result['finalOnlinePrice'],
+                    discount=result['discount'],
+                    source='search.costco.ca/fallback',
+                )
                 return text
         return None
+
+    @staticmethod
+    def _save_price_text(productId: str, itemID: str, text: str, source: str) -> None:
+        try:
+            data = json.loads(text)
+        except (json.JSONDecodeError, TypeError):
+            return
+        if not isinstance(data, dict):
+            return
+        price = (
+            data.get('finalOnlinePrice')
+            or data.get('price')
+            or data.get('salePrice')
+        )
+        discount = data.get('discount') or data.get('discountAmount') or 0
+        save_snapshot(
+            item_id=itemID,
+            product_id=productId,
+            price=price,
+            discount=discount,
+            source=source,
+        )
 
     def get_price(productId: str, itemID: str):
         proxy = os.getenv("COSTCO_PROXY")
@@ -118,11 +152,12 @@ class api_calls:
             'invCheckPostalCode': 'M1T%203C4',
             'invCheckCity': 'Scarborough'
         }
-        try: 
+        try:
             fallback = requests.get(price_api, cookies=cookies, headers=headers, proxies=proxies, timeout=15)
             fallback.raise_for_status()
             logger.info(f"Price for product ID: {productId} is {fallback.text}")
             print(fallback.text)
+            api_calls._save_price_text(productId, itemID, fallback.text, 'AjaxGetContractPrice/requests')
             return fallback.text
         except Exception as e:
             logger.error(f"Requests price endpoint failed: {e}")
@@ -145,6 +180,7 @@ class api_calls:
             print(response.text)
             logger.info(f"Price for product ID: {productId} is {response.text}")
             print(price_api)
+            api_calls._save_price_text(productId, itemID, response.text, 'AjaxGetContractPrice/tls_client')
             time.sleep(random.randint(1, 5))
             return response.text
         except Exception as e:

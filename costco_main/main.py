@@ -10,6 +10,7 @@ sys.path.append(a)
 
 import random
 from DiscordWebhook import discordWebhook
+from app.db import save_snapshot
 from selenium.webdriver.common.by import By
 import time
 import logging as logger
@@ -208,6 +209,18 @@ def main():
                 api_product['limited_offer'],
                 api_product['stock'],
             )
+            save_snapshot(
+                item_id=api_product['item_id'],
+                product_id=api_product['product_id'],
+                url=api_product['url'],
+                name=api_product['name'],
+                image=api_product['image'],
+                price=api_product['price'],
+                discount=api_product['discount'],
+                limited_offer=api_product['limited_offer'],
+                stock=api_product['stock'],
+                source='search.costco.ca',
+            )
             continue
 
         if proxies is None:
@@ -231,6 +244,18 @@ def main():
                 both_ids(product_id, data_catentry)
                 #Sends the information to the Discord Webhook
                 discordWebhook(url, name, price, image, discount, limited_offer, stock)
+                save_snapshot(
+                    item_id=data_catentry,
+                    product_id=product_id,
+                    url=url,
+                    name=name,
+                    image=image,
+                    price=price,
+                    discount=discount,
+                    limited_offer=limited_offer,
+                    stock=stock,
+                    source='selenium',
+                )
                 loaded = True
                 driver.quit()
                 break
