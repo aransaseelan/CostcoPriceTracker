@@ -41,23 +41,62 @@ def _row_to_response(row) -> ItemResponse:
 
 
 def get_items(filters: ItemFilters) -> List[ItemResponse]:
+    # Group by product_id (Costco's parent SKU), falling back to item_id when
+    # a row has no product_id. Within each group:
+    #   - price / discount / stock / scraped_at come from the LATEST snapshot
+    #   - item_id / url / name / image are taken from the most-recent snapshot
+    #     that actually has an image (so the row always carries an image when
+    #     ANY snapshot for that product captured one)
     sql = """
-        SELECT DISTINCT ON (item_id)
-            id, item_id, url, name, image, price, discount,
-            limited_offer, stock, scraped_at
-        FROM price_snapshots
-        WHERE item_id IS NOT NULL
+        WITH latest AS (
+            SELECT DISTINCT ON (COALESCE(product_id, item_id))
+                COALESCE(product_id, item_id) AS group_key,
+                id, item_id, price, discount, limited_offer, stock, scraped_at
+            FROM price_snapshots
+            WHERE item_id IS NOT NULL
+            ORDER BY COALESCE(product_id, item_id), scraped_at DESC
+        ),
+        meta AS (
+            SELECT DISTINCT ON (COALESCE(product_id, item_id))
+                COALESCE(product_id, item_id) AS group_key,
+                item_id AS meta_item_id,
+                url, name, image
+            FROM price_snapshots
+            WHERE item_id IS NOT NULL
+            ORDER BY
+                COALESCE(product_id, item_id),
+                (image IS NOT NULL) DESC,
+                (name IS NOT NULL) DESC,
+                scraped_at DESC
+        )
+        SELECT
+            l.id,
+            COALESCE(m.meta_item_id, l.item_id) AS item_id,
+            m.url, m.name, m.image,
+            l.price, l.discount, l.limited_offer, l.stock, l.scraped_at
+        FROM latest l
+        LEFT JOIN meta m ON m.group_key = l.group_key
     """
     params: List[Any] = []
+    where_clauses: List[str] = []
 
     if filters.item_id is not None:
-        sql += " AND item_id = %s"
-        params.append(filters.item_id)
+        # Resolve the filter against the merged identity: match either the
+        # canonical item_id we expose or any other item_id within the same
+        # product_id group.
+        where_clauses.append(
+            "(COALESCE(m.meta_item_id, l.item_id) = %s "
+            "OR l.group_key = (SELECT COALESCE(product_id, item_id) "
+            "                  FROM price_snapshots WHERE item_id = %s LIMIT 1))"
+        )
+        params.extend([filters.item_id, filters.item_id])
     if filters.limited_offer is not None:
-        sql += " AND limited_offer = %s"
+        where_clauses.append("l.limited_offer = %s")
         params.append(filters.limited_offer)
 
-    sql += " ORDER BY item_id, scraped_at DESC"
+    if where_clauses:
+        sql += " WHERE " + " AND ".join(where_clauses)
+    sql += " ORDER BY l.scraped_at DESC"
 
     try:
         with db.get_conn() as conn, conn.cursor() as cur:
@@ -94,10 +133,18 @@ def get_items(filters: ItemFilters) -> List[ItemResponse]:
 
 
 def get_item_history(item_id: int, limit: int = 200) -> List[PriceHistoryPoint]:
+    # Resolve item_id to its product group (product_id, with item_id fallback)
+    # so the chart shows the full price history across all sibling item_ids
+    # of the same Costco product page.
     sql = """
         SELECT scraped_at, price, discount, stock
         FROM price_snapshots
-        WHERE item_id = %s
+        WHERE COALESCE(product_id, item_id) = (
+            SELECT COALESCE(product_id, item_id)
+            FROM price_snapshots
+            WHERE item_id = %s
+            LIMIT 1
+        )
         ORDER BY scraped_at ASC
         LIMIT %s
     """
